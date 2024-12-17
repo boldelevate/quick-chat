@@ -55,7 +55,7 @@ $(function () {
             return;
         }
 
-        window.open(`https://wa.me/${phoneNumber}`, '_blank').focus();
+        window.open(`https://wa.me/+91${phoneNumber}`, '_blank').focus();
     });
 })
 

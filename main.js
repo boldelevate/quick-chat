@@ -4,6 +4,7 @@
 const dataSets = {
     "jaipur": affluentBusinessesJaipur,
     "noida": affluentBusinessesNoida,
+    "udaipur": affluentBusinessesUdaipur,
 }
 
 let current = null;

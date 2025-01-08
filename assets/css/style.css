@@ -1301,3 +1301,28 @@ span.sm {
   height: 100%;
   width: 35px;
 }
+
+#leads td .btn {
+  width: 100%;
+  text-align: left;
+}
+
+.cap {
+  text-transform: capitalize;
+}
+
+section.login {
+  height: 80vh;
+  display: flex;
+}
+
+button.swal2-cancel {
+  color: #ffffff;
+  background: #d5635b;
+}
+
+.username-logged-in {
+  text-align: right;
+  width: 100%;
+  padding-right: 22px;
+}

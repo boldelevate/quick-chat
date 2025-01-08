@@ -24,8 +24,16 @@
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.6.0/echarts.min.js"
+    integrity="sha512-XSmbX3mhrD2ix5fXPTRQb2FwK22sRMVQTpBP2ac8hX7Dh/605hA2QDegVWiAvZPiXIxOV0CbkmUjGionDpbCmw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/4.3.0/apexcharts.min.js"
+    integrity="sha512-QgLS4OmTNBq9TujITTSh0jrZxZ55CFjs4wjK8NXsBoZb04UYl8wWQJNaS8jRiLq6/c60bEfOj3cPsxadHICNfw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
   <script src="dataSets/affluent-businesses-jaipur.js"></script>
   <script src="dataSets/affluent-businesses-noida.js"></script>
   <script src="dataSets/affluent-businesses-udaipur.js"></script>
@@ -49,12 +57,15 @@
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
     </div><!-- End Logo -->
+    <div class="username-logged-in"></div>
   </header><!-- End Header -->
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
 
-    <ul class="sidebar-nav" id="sidebar-nav"></ul>
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li>Please sign in to access navigaion menu</li>
+    </ul>
 
   </aside><!-- End Sidebar-->
 
@@ -67,81 +78,332 @@
       </nav>
     </div><!-- End Page Title -->
 
-    <section class="section">
+    <section class="section dashboard">
       <div class="row">
-        <div class="col-lg-6">
+
+        <div class="col-lg-8">
+          <div class="row">
+
+            <!-- Sales Card -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card sales-card">
+                <div class="card-body">
+                  <h5 class="card-title">Chats <span>| Total</span></h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-chat"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="chats">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- End Sales Card -->
+
+            <!-- Revenue Card -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card customers-card">
+                <div class="card-body">
+                  <h5 class="card-title">Calls <span>| Total</span></h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-telephone"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="calls">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- End Revenue Card -->
+
+            <!-- Customers Card -->
+            <div class="col-xxl-4 col-xl-12">
+              <div class="card info-card revenue-card">
+                <div class="card-body">
+                  <h5 class="card-title">Conversions <span>| Total</span></h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-trophy"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="totalConversions">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- End Customers Card -->
+
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <div style="display: inline;" id="username">ME</div> <span> | Performance
+                      Tracker </span>
+                  </h5>
+                  <button type="button" class="btn btn-outline-primary" id="seeOthers"
+                    style=" display: block; position: absolute; top: 16px; right: 22px; font-size: 14px; ">See
+                    others</button>
+                  <!-- Line Chart -->
+                  <div id="reportsChart" style="min-height: 365px;" class="">
+                    <div class="d-flex justify-content-center">
+                      <div class="spinner-grow text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- End Line Chart -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+
+          <div class="col-lg-12">
+            <div class="card">
+              <div class="card-body pb-0">
+                <h5 class="card-title">Conversion Analysis<span> </span></h5>
+                <div id="trafficChart"
+                  style="min-height: 400px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;"
+                  class="echart">
+                  <div class="d-flex justify-content-center">
+                    <div class="spinner-grow text-primary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="col-xxl-12 col-xl-12">
+            <div class="card info-card revenue-card">
+              <div class="card-body">
+                <h5 class="card-title">Conversion Rate <span>| Overall</span></h5>
+                <div class="d-flex align-items-center">
+                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+                    style="color: #1c7ff2; background-color: #1c7ff226;">
+                    <i class="bi bi-patch-check"></i>
+                  </div>
+                  <div class="ps-3">
+                    <h6 id="conversionRate">
+                      <div class="spinner-grow text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
 
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Business Details</h5>
+              <h5 class="card-title">Lead Datasets Overview</h5>
+
+              <!-- Default Table -->
+              <table class="table cap">
+                <thead>
+                  <tr>
+                    <th scope="col">Index</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Total Leads</th>
+                    <th scope="col">Reachable Leads</th>
+                    <th scope="col">Approached</th>
+                    <th scope="col">Left to Approach</th>
+                  </tr>
+                </thead>
+                <tbody id="leadDataSetsOverview">
+                  <tr>
+                    <td>
+                      <div class="d-flex justify-content-center">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex justify-content-center">
+                        <div class="spinner-grow text-primary" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- End Default Table Example -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section dataset">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Lead DataSet Details</h5>
 
               <!-- General Form Elements -->
               <form>
                 <div class="row mb-3">
-                  <label for="BID" class="col-sm-2 col-form-label">ID</label>
-                  <div class="col-sm-10">
-                    <input id="BID" type="number" class="form-control" value="" autocomplete="off">
-                  </div>
-                  <div class="simple-error hide"></div>
-                </div>
-                <div class="row mb-3">
                   <label class="col-sm-2 col-form-label">Name</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" value="" id="name" disabled>
+                    <input type="text" class="form-control cap" value="" id="name" disabled>
                   </div>
                 </div>
                 <div class="row mb-3">
-                  <label class="col-sm-2 col-form-label">Address</label>
+                  <label class="col-sm-2 col-form-label">City</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" value="" id="phoneNumber" disabled>
+                    <input type="text" class="form-control cap" value="" id="city" disabled>
                   </div>
                 </div>
                 <div class="row mb-3">
-                  <label class="col-sm-2 col-form-label">Address</label>
+                  <label class="col-sm-2 col-form-label">Total Leads</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" value="" id="address" disabled>
+                    <input type="text" class="form-control" value="" id="total" disabled>
                   </div>
                 </div>
                 <div class="row mb-3">
-                  <label class="col-sm-2 col-form-label">Pincode</label>
+                  <label class="col-sm-2 col-form-label">Reachable Leads</label>
                   <div class="col-sm-10">
-                    <input type="text" class="form-control" value="" id="pincode" disabled>
+                    <input type="text" class="form-control" value="" id="reachable" disabled>
                   </div>
                 </div>
-                <div class="row mb-3">
-                  <label class="col-sm-2 col-form-label">District</label>
-                  <div class="col-sm-10">
-                    <input type="text" class="form-control" value="" id="district" disabled>
-                  </div>
-                </div>
-
-              </form><!-- End General Form Elements -->
-
+              </form>
             </div>
           </div>
-
         </div>
 
-        <div class="col-lg-6">
+      </div>
 
+      <div class="row">
+        <div class="col-lg-12">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Actions</h5>
+              <h5 class="card-title">Lead Explorer</h5>
 
-              <!-- Advanced Form Elements -->
-              <form onsubmit="return false">
-                <div class="row mb-3">
-                  <label class="col-sm-2 col-form-label">WhatsApp</label>
-                  <div class="col-sm-10">
-                    <button type="submit" class="btn btn-primary" id="SWC">Start WhatsApp Chat</button>
-                  </div>
-                </div>
+              <!-- Default Table -->
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Pincode</th>
+                    <th scope="col">Chat</th>
+                    <th scope="col">Call</th>
+                  </tr>
+                </thead>
+                <tbody id="leads">
 
-              </form><!-- End General Form Elements -->
-
+                </tbody>
+              </table>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
 
+    <section class="section login flex-column align-items-center justify-content-center py-4">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="pt-4 pb-2">
+                  <h5 class="card-title text-center pb-0 fs-4">Sign In</h5>
+                  <p class="text-center small">Enter your username &amp; password to login</p>
+                </div>
+                <form class="row g-3 needs-validation" onsubmit="return false;">
+                  <div class="col-12"><label for="yourUsername" class="form-label">Username</label><input
+                      formnovalidate="" type="text" name="username" class="form-control" id="yourUsername"
+                      autocomplete="off" required="">
+                    <div class="invalid-feedback">Please enter your username.</div>
+                  </div>
+                  <div class="col-12"><label for="yourPassword" class="form-label">Password</label><input
+                      formnovalidate="" type="password" name="password" class="form-control" id="yourPassword"
+                      autocomplete="off" required="">
+                    <div class="invalid-feedback">Please enter your password!</div>
+                  </div>
+                  <div class="col-12"><button class="btn btn-primary w-100" type="submit" onclick="signIn()">Sign
+                      In</button>
+                  </div>
+                  <div class="col-12">
+                    <!-- <p class="small mb-0">Having trouble loggin in? <a href="tel:+917737667791">Contact Us</a></p> -->
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="credits"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -155,14 +417,6 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-
-  <section class="section home">
-    <h1>Select a City</h1>
-    <br />
-    <div class="row select-city">
-
-    </div>
-  </section>
 
 </body>
 

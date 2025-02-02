@@ -5,11 +5,13 @@ const serverSideUrl = "https://quickchat-backend.vercel.app/";
 const requestUrl = serverSideUrl + "request";
 
 const dataSets = {
-    "jaipur": affluentBusinessesJaipur,
-    "noida": affluentBusinessesNoida,
-    "udaipur": affluentBusinessesUdaipur,
-    "chandigarh": affluentBusinessesChandigarh,
+    A1: DATASET_A1,
+    A2: DATASET_A2,
+    A3: DATASET_A3,
+    A4: DATASET_A4,
 }
+
+const dailyTarget = 10;
 
 const getUserDetails = () => {
     return (localStorage.getItem("username") === null) ? null : {
@@ -123,9 +125,9 @@ const loadMenu = (dataSets) => {
         html += `
              <div class="col-lg-6">
                 <div class="card" onclick="${onClick}">
-                <!--  <span class="sm"> <i class="bi bi-geo-alt"></i> </span> -->
+                <!--  <span class="sm"> <i class="bi bi-globe-americas"></i> </span> -->
                 <div class="card-body load-city">
-                    <h1 class="cn"><i class="bi bi-geo-alt"></i> ${dataSet}</h1>
+                    <h1 class="cn"><i class="bi bi-globe-americas"></i> ${dataSet}</h1>
                     <h1 class="fl"><i class="bi bi-arrow-right"></i></h1>
                 </div>
                 </div>
@@ -152,8 +154,8 @@ const loadNavBar = (dataSets) => {
         html += `
             <li class="nav-item" onclick="${onClick}">
                 <a class="nav-link collapsed" disabled>
-                    <i class="bi bi-geo-alt"></i>
-                    <span>${dataSet}</span>
+                    <i class="bi bi-globe-americas"></i>
+                    <span>Lead-DataSet-${dataSet}</span>
                 </a>
             </li>
         `;
@@ -189,7 +191,7 @@ const loadDataSetInApp = (name, dataSet) => {
     for (const entry of dataSet) {
         $("#leads").append(`
             <tr>
-                <td scope="row">${entry.Index}</td>
+                <td scope="row">${entry.ID}</td>
                 <td>${entry.Name.substring(0, MAX_CHARS_NAME)}</td>
                 <td>${entry['Phone-Number']}</td>
                 <td>${entry.Address.substring(0, MAX_CHARS_ADDRESS)}...</td>
@@ -197,13 +199,13 @@ const loadDataSetInApp = (name, dataSet) => {
                 <td>
                     ${(entry['Phone-Number'].trim() === "-") ?
                 `<button type="button" class="btn btn-danger"> <i class="bi bi-whatsapp me-2"></i> Not available </button >` :
-                `<button type="button" class="btn btn-success waap" onclick="window.open('https://wa.me/+91${entry['Phone-Number'].replace(/ /g, "").replace("+91", "")}', '_blank').focus(); addChat(\`${name.toLowerCase()}\`, \`${entry.Index}\`, \`${entry.Name.toLowerCase()}\`)"> <i class="bi bi-whatsapp me-2"></i> WhatsApp </button >`
+                `<button type="button" class="btn btn-success waap" onclick="window.open('https://wa.me/+91${entry['Phone-Number'].replace(/ /g, "").replace("+91", "")}', '_blank').focus(); addChat(\`${name.toLowerCase()}\`, \`${entry.ID}\`, \`${entry.Name.toLowerCase()}\`)"> <i class="bi bi-whatsapp me-2"></i> WhatsApp </button >`
             }
                 </td >
                 <td>
                     ${(entry['Phone-Number'].trim() === "-") ?
                 `<button type="button" class="btn btn-danger"> <i class="bi bi-telephone me-2"></i> Not available </button >` :
-                `<button type="button" class="btn btn-success waap" onclick="window.open('tel:+91${entry['Phone-Number'].replace(/ /g, "").replace("+91", "")}', '_blank').focus(); addCall(\`${name.toLowerCase()}\`, \`${entry.Index}\`, \`${entry.Name.toLowerCase()}\`)"> <i class="bi bi-telephone me-2"></i> Call </button >`
+                `<button type="button" class="btn btn-success waap" onclick="window.open('tel:+91${entry['Phone-Number'].replace(/ /g, "").replace("+91", "")}', '_blank').focus(); addCall(\`${name.toLowerCase()}\`, \`${entry.ID}\`, \`${entry.Name.toLowerCase()}\`)"> <i class="bi bi-telephone me-2"></i> Call </button >`
             }
                 </td >
             </tr>
@@ -214,7 +216,7 @@ const loadDataSetInApp = (name, dataSet) => {
 
     $("#name").val((`PhoenixAI-Lead-DataSet-${name}`));
     $("#city").val(name);
-    $("#total").val(dataSet.length);
+    // $("#total").val(dataSet.length);
     $("#reachable").val(reachable);
 }
 
@@ -300,29 +302,30 @@ const loadDashboard = (username = localStorage.getItem("selectUser")) => {
                 });
 
                 $("#reportsChart").html("");
-                $("#seeOthers").click(() => {
-                    Swal.fire({
-                        title: "Track Performance for Executive",
-                        // icon: "info",
-                        html: `
-                        <p>Select an executive</p>
-                          ${users.map(u => {
-                            return `
-                                <div class="d-grid gap-2 mt-3" onclick="localStorage.setItem(\`selectUser\`, \`${u}\`); window.location.assign(location)">
-                                    <button class="btn btn-outline-primary btn-sm" type="button">${u}</button>
-                                </div> 
-                            `
-                        }).join(' ')}
-                        `,
-                        showCancelButton: true,
-                        showConfirmButton: false,
-                        cancelButtonText: `Cancel`,
+                if (data.admin) {
+                    $("#seeOthers").css("visibility", "visible");
+                    $("#seeOthers").click(() => {
+                        Swal.fire({
+                            title: "Track Performance for Executive",
+                            // icon: "info",
+                            html: `
+                            <p>Select an executive</p>
+                              ${users.map(u => {
+                                return `
+                                    <div class="d-grid gap-2 mt-3" onclick="localStorage.setItem(\`selectUser\`, \`${u}\`); window.location.assign(location)">
+                                        <button class="btn btn-outline-primary btn-sm" type="button">${u}</button>
+                                    </div> 
+                                `
+                            }).join(' ')}
+                            `,
+                            showCancelButton: true,
+                            showConfirmButton: false,
+                            cancelButtonText: `Cancel`,
+                        });
                     });
-                });
-
-                $("#chats").html(data.chats);
-                $("#calls").html(data.calls);
-                $("#conversionRate").html((totalCOnversions / data.reachOuts * 100).toFixed(2) + "%");
+                } else {
+                    $("#seeOthers").remove();
+                }
 
                 const chats = [];
                 const calls = [];
@@ -398,13 +401,45 @@ const loadDashboard = (username = localStorage.getItem("selectUser")) => {
                     }
                 }).render();
 
+                $(".timeFrame").css("visibility", "visible");
+                if (data.admin) {
+                    $("#chats").html(data.chats);
+                    $("#calls").html(data.calls);
+                    $("#conversionRate").html((totalCOnversions / data.reachOuts * 100).toFixed(2) + "%");
+                } else {
+                    const chatsToday = chats[chats.length - 1], callsToday = calls[calls.length - 1];
+                    const reached = (chatsToday > callsToday) ? chatsToday : callsToday;
+                    $(".timeFrame").html("Today")
+                    $("#chats").html(chatsToday);
+                    $("#calls").html(callsToday);
+                    $(".card-heading-custom").html(`Todays Target Status`);
+                    $("#conversionRate").html((reached < dailyTarget) ? `<span class="text-danger">${reached} / ${dailyTarget} (${reached / dailyTarget * 100}%)</span>` : `<span class="text-success">${reached} / ${dailyTarget} (${reached / dailyTarget * 100}%)</span>`);
+                    $(".target-indicator").css((reached < dailyTarget) ? {
+                        "color": "#dc3545",
+                        "background-color": "#ffd7db"
+                    } : {
+                        "color": "rgb(46 202 106)",
+                        "background-color": "rgb(224 248 233)"
+                    })
+                    if (reached < dailyTarget) $(".target-indicator").html(`<i class="bi bi-exclamation-triangle"></i>`);
+
+                    const contentTargetStatus = $("#contentTargetStatus").html();
+                    const contentConversionsStatus = $("#contentConversionsStatus").html();
+
+                    $("#contentTargetStatus").html(contentConversionsStatus);
+                    $("#contentConversionsStatus").html(contentTargetStatus);
+                }
+
+                $(".hide-icon").removeClass("hide-icon");
+
                 let totalLeads = 0, reachableLeads = 0, approachedLeads = 0, leadsLeftToApproach = 0;
                 $("#leadDataSetsOverview").html("");
                 for (const [index, [key, value]] of Object.entries(Object.entries(dataSets))) {
 
-                    const approached = (key.toLocaleLowerCase() === 'jaipur') ?
-                        data.chatsArray.filter(e => e.city.toLowerCase() === key.toLowerCase()).length + 290 :
-                        data.chatsArray.filter(e => e.city.toLowerCase() === key.toLowerCase()).length;
+                    const chatsCount = data.chatsArray.filter(e => e.city.toLowerCase() === key.toLowerCase()).length,
+                        callsCount = data.callsArray.filter(e => e.city.toLowerCase() === key.toLowerCase()).length;
+                    const max = ((chatsCount > callsCount) ? chatsCount : callsCount);
+                    const approached = (key.toLocaleLowerCase() === 'jaipur') ? max + 290 : max;
 
                     const reachable = value.length - value.filter(e => e['Phone-Number'].trim() === "-").length;
                     const leftToApproach = reachable - approached;
@@ -420,7 +455,6 @@ const loadDashboard = (username = localStorage.getItem("selectUser")) => {
                             <td scope="col">${`PhoenixAI-Lead-DataSet-${key}`}</td>
                             <td scope="col">${key}</td>
                             <td scope="col">${value.length}</td>
-                            <td scope="col"><button type="button" class="btn btn-primary"> ${reachable} </button></td>
                             <td scope="col"><button type="button" class="btn btn-primary"> ${approached} </button></td>
                             <td scope="col"><button type="button" class="btn btn-success"> ${leftToApproach} </button></td>
                         </td >
@@ -433,7 +467,6 @@ const loadDashboard = (username = localStorage.getItem("selectUser")) => {
                         <td scope="col"></td>
                         <td scope="col"></td>
                         <td scope="col">${totalLeads}</td>
-                        <td scope="col"> <button type="button" class="btn btn-primary"> ${reachableLeads} </button> </td>
                         <td scope="col"> <button type="button" class="btn btn-primary"> ${approachedLeads} </button> </td>
                             <td scope="col"><button type="button" class="btn btn-success"> ${leadsLeftToApproach} </button></td>
                     </td >

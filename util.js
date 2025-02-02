@@ -412,7 +412,7 @@ const loadDashboard = (username = localStorage.getItem("selectUser")) => {
                     $(".timeFrame").html("Today")
                     $("#chats").html(chatsToday);
                     $("#calls").html(callsToday);
-                    $(".card-heading-custom").html(`Todays Target Status`);
+                    $(".card-heading-custom").html(`Today's Target Status`);
                     $("#conversionRate").html((reached < dailyTarget) ? `<span class="text-danger">${reached} / ${dailyTarget} (${reached / dailyTarget * 100}%)</span>` : `<span class="text-success">${reached} / ${dailyTarget} (${reached / dailyTarget * 100}%)</span>`);
                     $(".target-indicator").css((reached < dailyTarget) ? {
                         "color": "#dc3545",

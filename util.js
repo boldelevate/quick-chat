@@ -1,5 +1,6 @@
 const MAX_CHARS_ADDRESS = 20;
 const MAX_CHARS_NAME = 30;
+const OWNERSHIP_RIGHT_VALUE = 4500;
 
 const serverSideUrl = "https://quickchat-backend.vercel.app/";
 const requestUrl = serverSideUrl + "request";
@@ -141,10 +142,16 @@ const loadNavBar = (dataSets) => {
     let html = "";
     $(".sidebar-nav").html("");
     html += `
-            <li class="nav-item" onclick="window.location.assign(location)">
+            <li class="nav-item" onclick="window.location.assign('index.html')">
                 <a class="nav-link collapsed" disabled>
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item" onclick="window.location.assign('benefits.html')">
+                <a class="nav-link collapsed" disabled>
+                    <i class="bi bi-trophy"></i>
+                    <span>OR Tracker</span>
                 </a>
             </li>
             <li class="nav-heading">Lead datasets</li>
@@ -218,6 +225,130 @@ const loadDataSetInApp = (name, dataSet) => {
     $("#city").val(name);
     // $("#total").val(dataSet.length);
     $("#reachable").val(reachable);
+}
+
+const calculatePayPerConversion = (conversions) => {
+    let payPerConversion, slab;
+
+    if (conversions <= 40) {
+        payPerConversion = 562.5;
+        slab = 1;
+    }
+    else if (conversions > 40 && conversions <= 50) {
+        payPerConversion = 600;
+        slab = 2;
+    }
+    else if (conversions > 50 && conversions <= 60) {
+        payPerConversion = 650;
+        slab = 3;
+    }
+    else if (conversions > 60 && conversions <= 70) {
+        payPerConversion = 700;
+        slab = 4;
+    }
+    else if (conversions > 70 && conversions <= 80) {
+        payPerConversion = 750;
+        slab = 5;
+    }
+    else if (conversions > 80 && conversions <= 90) {
+        payPerConversion = 800;
+        slab = 6;
+    }
+    else if (conversions > 90 && conversions <= 100) {
+        payPerConversion = 850;
+        slab = 7;
+    }
+    else if (conversions > 100) {
+        payPerConversion = 900;
+        slab = 8;
+    }
+
+    return {
+        payPerConversion: payPerConversion,
+        slab: slab
+    };
+}
+const showBenefits = () => {
+
+    showSection("benefits");
+    window.scrollTo(0, 0);
+
+    $(".pagetitle h1").html(name);
+
+    $(".breadcrumb").html(`
+        <li class="breadcrumb-item">QuickChat</li>
+        <li class="breadcrumb-item active">OR Tracker</li>
+        <li class="breadcrumb-item active" style="text-transform: lowercase;">${localStorage.getItem('selectUser')}</li>
+    `);
+
+    // $(".username").html(getUserDetails().username);
+
+    $.get("https://docs.google.com/spreadsheets/d/e/2PACX-1vQzXmUtM791v3cI6qtSD7ZAVFprLEPviwgsUBrJNmgYysMwckx7EdCR-4AbRiaSgXFzG-t0HDJIi4A0/pub?output=csv", {}, function (data, status) {
+        const conversionsJSON = csvJSON(data);
+        const peopleAndConversions = {};
+
+        for (const conversion of conversionsJSON) {
+            const name = conversion["On-Boarded By"];
+            const key = name.replace(/ /g, "").toLowerCase();
+            if (peopleAndConversions[key] == undefined) {
+                peopleAndConversions[key] = 1;
+            } else {
+                peopleAndConversions[key] = peopleAndConversions[key] + 1;
+            }
+        }
+
+        const conversions = (peopleAndConversions.hasOwnProperty(localStorage.getItem('selectUser'))) ? peopleAndConversions[localStorage.getItem('selectUser')] : 0;
+        const payPerConversion = calculatePayPerConversion(conversions).payPerConversion;
+        const monetaryValue = (conversions * payPerConversion).toLocaleString('en-IN', {
+            maximumFractionDigits: 2,
+            style: 'currency',
+            currency: 'INR'
+        });
+
+        const ownershipRights = (conversions * payPerConversion / OWNERSHIP_RIGHT_VALUE).toFixed(2);
+
+        console.log(peopleAndConversions)
+
+        $("#clevel").remove();
+        $(".username").html(localStorage.getItem('selectUser'))
+        $("#yourConversions").html(conversions);
+        $("#yourOwnershipRights").html(ownershipRights);
+        $("#monetaryValue").html(monetaryValue);
+        $(`.ppc-slab-${calculatePayPerConversion(conversions).slab}`).html(`<button id="clevel" type="button" class="btn btn-sm btn-success"><i class="bi bi-check-lg"> ${conversions} Conversions</i> </<button`);
+
+
+        $("#cv").val(conversions);
+        detailedBreakdown();
+    });
+}
+
+const detailedBreakdown = () => {
+    const conversions = $("#cv").val();
+
+    if (!conversions.length) {
+        $(`.n-conversions, .slab, .ppc, .mv, .ppr, .or`).html("-")
+        return
+    };
+    const o = calculatePayPerConversion(conversions);
+
+    $(`.n-conversions`).html(conversions);
+    $(`.slab`).html(`Slab ${o.slab}`);
+    $(`.ppc`).html((o.payPerConversion).toLocaleString('en-IN', {
+        maximumFractionDigits: 2,
+        style: 'currency',
+        currency: 'INR'
+    }));
+    $(`.mv`).html(`${(conversions * o.payPerConversion).toLocaleString('en-IN', {
+        maximumFractionDigits: 2,
+        style: 'currency',
+        currency: 'INR'
+    })} &nbsp; <i>[ = ${conversions} * ${o.payPerConversion} ] </i>`);
+    $(`.ppr`).html((OWNERSHIP_RIGHT_VALUE).toLocaleString('en-IN', {
+        maximumFractionDigits: 2,
+        style: 'currency',
+        currency: 'INR'
+    }));
+    $(`.or`).html(`${(conversions * o.payPerConversion / OWNERSHIP_RIGHT_VALUE).toFixed(2)} <i>[ ${(conversions * o.payPerConversion).toFixed(2)} ÷ ${OWNERSHIP_RIGHT_VALUE} ]</>`);
 }
 
 const unixTimeStamp = (d) => parseInt((d.getTime() / 1000).toFixed(0))
@@ -516,7 +647,7 @@ const addCall = (city, id, name) => {
 }
 
 const showDashboard = () => {
-    showSection("dashboard");
+    showSection("main-dashboard");
 
     $(".pagetitle h1").html("Dashboard");
     $(".breadcrumb").html(`
@@ -532,6 +663,11 @@ const showLogin = () => {
 const initApp = () => {
     $(".username-logged-in").html(getUserDetails().username)
     loadNavBar(dataSets);
-    showDashboard();
-    loadDashboard();
+
+    if (!window.location.href.includes("benefits")) {
+        showDashboard();
+        loadDashboard();
+    } else {
+        showBenefits();
+    }
 }

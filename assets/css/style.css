@@ -1332,3 +1332,14 @@ button.swal2-cancel {
 .hide-icon {
   visibility: hidden;
 }
+
+.card.pop {
+  font-family: "Poppins", sans-serif;
+  font-size: medium;
+  min-height: 60vh;
+}
+
+.b-label label {
+  font-weight: bold;
+  opacity: 0.8;
+}
